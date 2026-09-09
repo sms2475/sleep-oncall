@@ -1,0 +1,624 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-s
+cale=1"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemF
+ont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found]){d
+isplay:none!important}</style></head><body>
+<title>Sleep On-Call Roster</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,50
+0;8..60,600;8..60,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&displ
+ay=swap">
+<style>
+  :root{
+    --paper:#EEF2F1;
+    --surface:#FFFFFF;
+    --surface-2:#E4EAE8;
+    --ink:#16232B;
+    --muted:#52636B;
+    --line:rgba(22,35,43,0.12);
+    --accent:#1C8C82;
+    --accent-ink:#0B4A45;
+    --accent-soft:#DCF0EC;
+    --status:#C97A2E;
+    --status-soft:#FBE9D6;
+    --changed:#B8952A;
+    --changed-bg:#FFF6D6;
+    --changed-soft:#FFF3B0;
+    --changed-ink:#8A6D1B;
+    --shadow: 0 1px 2px rgba(22,35,43,0.06), 0 8px 24px rgba(22,35,43,0.06);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:#0F1A1C;
+      --surface:#16262A;
+      --surface-2:#1D2F33;
+      --ink:#E4EEEC;
+      --muted:#93A6A4;
+      --line:rgba(228,238,236,0.12);
+      --accent:#4FD1C0;
+      --accent-ink:#B7F1E8;
+      --accent-soft:#173733;
+      --status:#E8A94A;
+      --status-soft:#3A2A14;
+      --changed:#C9A83D;
+      --changed-bg:#3A331A;
+      --changed-soft:#4A3D14;
+      --changed-ink:#F5E08A;
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px rgba(0,0,0,0.35);
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#0F1A1C;
+    --surface:#16262A;
+    --surface-2:#1D2F33;
+    --ink:#E4EEEC;
+    --muted:#93A6A4;
+    --line:rgba(228,238,236,0.12);
+    --accent:#4FD1C0;
+    --accent-ink:#B7F1E8;
+    --accent-soft:#173733;
+    --status:#E8A94A;
+    --status-soft:#3A2A14;
+    --changed:#C9A83D;
+    --changed-bg:#3A331A;
+    --changed-soft:#4A3D14;
+    --changed-ink:#F5E08A;
+    --shadow: 0 1px 2px rgba(0,0,0,035);
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'IBM Plex Sans', ui-erif;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3{
+    font-family:'Source Serif 4', Ge
+    text-wrap:balance;
+    margin:0;
+  }
+  .mono{ font-family:'IBM Plex Mono'nt-variant-numeric:tabular-nums; }
+  button{ font-family:inherit; }
+  :focus-visible{ outline:2px solid :2px; }
+
+  /* ---------- Gate ---------- */
+  #gate{
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+  }
+  .gate-card{
+    width:100%;
+    max-width:380px;
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:14px;
+    box-shadow:var(--shadow);
+    padding:36px 32px 32px;
+  }
+  .gate-eyebrow{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:var(--accent-ink);
+    margin-bottom:14px;
+  }
+  .gate-dot{
+    width:8px;height:8px;border-radius:50%;
+    background:var(--status);
+    box-shadow:0 0 0 4px var(--status-soft);
+  }
+  .gate-card h1{ font-size:26px; line-height:1.2; margin-bottom:6px; }
+  .gate-card p.sub{ color:var(--mute0 26px; line-height:1.5; }
+  .field-label{
+    display:block; font-size:12px; lnsform:uppercase;
+    color:var(--muted); margin-bottom:6px; font-weight:500;
+  }
+  .gate-input{
+    width:100%;
+    padding:11px 14px;
+    border-radius:8px;
+    border:1px solid var(--line);
+    background:var(--paper);
+    color:var(--ink);
+    font-size:15px;
+    margin-bottom:16px;
+  }
+  #gate-error{
+    color:var(--status);
+    font-size:13px;
+    min-height:18px;
+    margin-bottom:10px;
+    margin-top:-8px;
+  }
+  #unlock-btn{
+    width:100%;
+    padding:12px 14px;
+    border:none;
+    border-radius:8px;
+    background:var(--accent);
+    color:var(--surface);
+    font-size:15px;
+    font-weight:600;
+    cursor:pointer;
+    transition:opacity .15s ease;
+  }
+  #unlock-btn:hover{ opacity:.9; }
+  .gate-foot{
+    margin-top:20px;
+    padding-top:16px;
+    border-top:1px solid var(--line)
+    font-size:12.5px;
+    color:var(--muted);
+    line-height:1.5;
+  }
+
+  /* ---------- App ---------- */
+  #app{ display:none; min-height:100vh; }
+  .wrap{ max-width:760px; margin:0 a}
+
+  header.top{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom:22px;
+    flex-wrap:wrap;
+  }
+  header.top h1{ font-size:24px; }
+  header.top .subtitle{ color:var(--muted); font-size:13px; margin-top:4px; }
+  .updated{ font-size:12px; color:vaPlex Mono',monospace; white-space:nowr
+ap; }
+
+  .tabs{
+    display:flex;
+    gap:6px;
+    margin-bottom:20px;
+    border-bottom:1px solid var(--line);
+  }
+  .tab{
+    padding:9px 16px;
+    font-size:13.5px;
+    font-weight:500;
+    color:var(--muted);
+    background:none;
+    border:none;
+    border-bottom:2px solid transpar
+    cursor:pointer;
+    margin-bottom:-1px;
+  }
+  .tab.active{
+    color:var(--accent-ink);
+    border-bottom-color:var(--accent
+  }
+  .tab[disabled]{ opacity:.45; curso
+
+  /* Now card */
+  .now-card{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:14px;
+    box-shadow:var(--shadow);
+    padding:22px 24px;
+    margin-bottom:26px;
+    display:flex;
+    align-items:center;
+    gap:20px;
+    flex-wrap:wrap;
+  }
+  .now-badge{
+    display:flex; align-items:center
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px; letter-spacing:.;
+    color:var(--status);
+  }
+  .now-dot{
+    width:8px;height:8px;border-radi
+    background:var(--status);
+    box-shadow:0 0 0 4px var(--statu
+    flex:none;
+  }
+  .now-name{ font-family:'Source Serif 4', serif; font-size:30px; font-weight:600; line-height:1.1; }
+  .now-range{ color:var(--muted); fox; }
+  .now-comment{
+    margin-left:auto;
+    font-size:12.5px;
+    color:var(--accent-ink);
+    background:var(--accent-soft);
+    padding:5px 10px;
+    border-radius:999px;
+    white-space:nowrap;
+  }
+  .now-flex{ display:flex; flex-dire
+
+  /* Filter chips */
+  .chips{
+    display:flex; gap:8px; flex-wrap
+  }
+  .chip{
+    display:flex; align-items:center; gap:7px;
+    padding:6px 12px;
+    border-radius:999px;
+    border:1px solid var(--line);
+    background:var(--surface);
+    font-size:13px;
+    cursor:pointer;
+    color:var(--ink);
+  }
+  .chip .count{ color:var(--muted); onospace; font-size:11.5px; }
+  .chip.active{ background:var(--accent-soft); border-color:var(--accent); color:var(--accent-ink); }
+  .chip .swatch{ width:9px; height:9
+
+  /* Schedule list */
+  .month-heading{
+    position:sticky; top:0;
+    background:var(--paper);
+    padding:14px 2px 6px;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    color:var(--muted);
+    z-index:2;
+  }
+  .week-row{
+    display:grid;
+    grid-template-columns:104px 1fr
+    align-items:center;
+    gap:14px;
+    padding:12px 14px;
+    border-radius:10px;
+    background:var(--surface);
+    border:1px solid var(--line);
+    margin-bottom:6px;
+  }
+  .week-row.is-today{
+    border-color:var(--status);
+    box-shadow:0 0 0 1px var(--status);
+  }
+  .week-row.is-past{ opacity:.55; }
+  .week-row.is-changed{
+    background:var(--changed-bg);
+    border-color:var(--changed);
+    box-shadow:0 0 0 1px var(--changed);
+  }
+  .week-row.is-changed.is-past{ opacity:.85; }
+  .week-dates{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12.5px;
+    color:var(--muted);
+    line-height:1.35;
+  }
+  .week-dates .yr{ font-size:10.5px;
+  .week-mid{ min-width:0; }
+  .week-name{ font-size:15px; font-w
+  .week-comment{ font-size:12.5px; color:var(--muted); margin-top:2px; }
+  .week-swatch{ width:8px; height:8p:inline-block; margin-right:7px; }
+  .week-badges{ display:flex; flex-direction:column; gap:4px; align-items:flex-end; }
+  .badge-backup{
+    font-size:10.5px;
+    letter-spacing:.04em;
+    text-transform:uppercase;
+    color:var(--status);
+    background:var(--status-soft);
+    padding:2px 7px;
+    border-radius:999px;
+    white-space:nowrap;
+  }
+  .badge-changed{
+    font-size:10.5px;
+    letter-spacing:.04em;
+    text-transform:uppercase;
+    color:var(--changed-ink);
+    background:var(--changed-soft);
+    padding:2px 7px;
+    border-radius:999px;
+    white-space:nowrap;
+  }
+
+  .totals-foot{
+    margin-top:30px;
+    padding-top:18px;
+    border-top:1px solid var(--line)
+    display:flex;
+    gap:22px;
+    flex-wrap:wrap;
+    font-size:12.5px;
+    color:var(--muted);
+  }
+  .totals-foot b{ color:var(--ink); font-family:'IBM Plex Mono',monospace; }
+
+  .empty-msg{ color:var(--muted); font-size:14px; padding:24px 4px; text-align:center; }
+
+  @media (max-width:480px){
+    .week-row{ grid-template-columns
+    .week-row .week-badges{ grid-column:2; justify-self:start; margin-top:4px; flex-direction:row; alig
+n-items:center; }
+    .now-card{ flex-direction:column; align-items:flex-start; }
+    .now-comment{ margin-left:0; }
+  }
+</style>
+
+<div id="gate">
+  <div class="gate-card">
+    <div class="gate-eyebrow"><span  Medicine · On-Call</div>
+    <h1>Who's on call</h1>
+    <p class="sub">Enter the shared -call roster.</p>
+    <label class="field-label" for="password">Password</label>
+    <input id="password" class="gateomplete="current-password" placeholder
+="••••••••" />
+    <div id="gate-error"></div>
+    <button id="unlock-btn">View schedule</button>
+    <div class="gate-foot">Don't havhared this link with you.</div>
+  </div>
+</div>
+
+<div id="app">
+  <div class="wrap">
+    <header class="top">
+      <div>
+        <h1>Sleep On-Call Roster</h1
+        <div class="subtitle">Weekly sleep on-call coverage — Scott, Elias, Kiara, Lauren</div>
+      </div>
+      <div class="updated" id="updated-label"></div>
+    </header>
+
+    <nav class="tabs" id="tabs"></na
+
+    <div class="now-card" id="now-ca
+
+    <div class="chips" id="chips"></
+
+    <div id="list"></div>
+
+    <div class="totals-foot" id="tot
+  </div>
+</div>
+
+<script>
+// ---- Data (parsed from the on-call spreadsheet; add another key here for future years) ----
+const SCHEDULE = {"Sheet1":{"people"uren"],"weeks":[{"start":"2026-06-30",
+"end":"2026-07-06","comment":"","values":{"Scott":1,"Elias":0,"Kiara":0,"Lauren":0},"onCall":"Scott"},{
+"start":"2026-07-07","end":"2026-07-cott":0,"Elias":1,"Kiara":0,"Lauren":0
+},"onCall":"Elias"},{"start":"2026-07-14","end":"2026-07-20","comment":"","values":{"Scott":1,"Elias":0
+,"Kiara":0,"Lauren":0},"onCall":"Scond":"2026-07-27","comment":"","values"
+:{"Scott":1,"Elias":0,"Kiara":0,"Lauren":0},"onCall":"Scott"},{"start":"2026-07-28","end":"2026-08-03",
+"comment":"Kiara start","values":{"SLauren":0},"onCall":"Scott"},{"start":
+"2026-08-04","end":"2026-08-10","comment":"","values":{"Scott":2,"Elias":0,"Kiara":1,"Lauren":0},"onCal
+l":"Scott"},{"start":"2026-08-11","e,"values":{"Scott":1,"Elias":0,"Kiara"
+:0,"Lauren":0},"onCall":"Scott"},{"start":"2026-08-18","end":"2026-08-24","comment":"","values":{"Scott
+":0,"Elias":1,"Kiara":0,"Lauren":0},026-08-25","end":"2026-08-31","comment
+":"","values":{"Scott":0,"Elias":0,"Kiara":1,"Lauren":0},"onCall":"Kiara"},{"start":"2026-09-01","end":
+"2026-09-07","comment":"Lauren Start:0,"Kiara":0,"Lauren":0},"onCall":"Sco
+tt"},{"start":"2026-09-08","end":"2026-09-14","comment":"","values":{"Scott":0,"Elias":0,"Kiara":1,"Lau
+ren":0},"onCall":"Kiara"},{"start":"","comment":"","values":{"Scott":2,"El
+ias":0,"Kiara":0,"Lauren":1},"onCall":"Scott"},{"start":"2026-09-22","end":"2026-09-28","comment":"","v
+alues":{"Scott":0,"Elias":0,"Kiara":"},{"start":"2026-09-29","end":"2026-1
+0-05","comment":"","values":{"Scott":1,"Elias":0,"Kiara":0,"Lauren":0},"onCall":"Scott"},{"start":"2026
+-10-06","end":"2026-10-12","comment":0,"Elias":0,"Kiara":1,"Lauren":0},"on
+Call":"Kiara"},{"start":"2026-10-13","end": … [+4659 chars]
+
+const SHEET_LABELS = { "Sheet1": "2026–27" };
+
+const PASSWORD = "sleepcall2026";
+
+function colorForIndex(i){
+  const palette = ["#1C8C82","#C97A2
+  return palette[i % palette.length];
+}
+
+function fmtRange(startISO, endISO){
+  const s = new Date(startISO + "T00:00:00");
+  const e = new Date(endISO + "T00:0
+  const opts = { month:"short", day:"numeric" };
+  const sStr = s.toLocaleDateString(
+  const eStr = e.toLocaleDateString("en-US", opts);
+  return sStr + " – " + eStr;
+}
+function monthYearKey(iso){
+  const d = new Date(iso + "T00:00:00");
+  return d.toLocaleDateString("en-USric" });
+}
+function todayISO(){
+  const d = new Date();
+  return d.toISOString().slice(0,10)
+}
+
+let activeSheet = Object.keys(SCHEDULE)[0];
+let activeFilter = null; // person n
+let changedWeeksBySheet = {}; // computed once per load, keyed by sheet -> Set(start ISO)
+
+// ---- Change detection: diff current SCHEDULE against what this browser saw last visit ----
+function computeAndStoreChangedWeeks
+  const data = SCHEDULE[sheetKey];
+  const storageKey = "sleep-oncall-s
+  let prev = null;
+  try { prev = JSON.parse(localStorall"); } catch(e) { prev = null; }
+  const changed = new Set();
+  if (prev) {
+    const prevByStart = {};
+    prev.forEach(w => { prevByStart[
+    data.weeks.forEach(w => {
+      const pw = prevByStart[w.start
+      if (!pw || pw.onCall !== w.onCall || pw.comment !== w.comment || JSON.stringify(pw.values) !== JS
+ON.stringify(w.values)) {
+        changed.add(w.start);
+      }
+    });
+  }
+  changedWeeksBySheet[sheetKey] = changed;
+  try {
+    const snapshot = data.weeks.map(w => ({ start: w.start, onCall: w.onCall, comment: w.comment, value
+s: w.values }));
+    localStorage.setItem(storageKey, JSON.stringify(snapshot));
+  } catch(e) {}
+}
+function primeChangedWeeks(){
+  Object.keys(SCHEDULE).forEach(computeAndStoreChangedWeeks);
+}
+
+function buildTabs(){
+  const tabs = document.getElementById("tabs");
+  tabs.innerHTML = "";
+  Object.keys(SCHEDULE).forEach(key => {
+    const btn = document.createEleme
+    btn.className = "tab" + (key === activeSheet ? " active" : "");
+    btn.textContent = SHEET_LABELS[k
+    btn.onclick = () => { activeSheet = key; activeFilter = null; render(); };
+    tabs.appendChild(btn);
+  });
+}
+
+function buildNowCard(){
+  const data = SCHEDULE[activeSheet];
+  const today = todayISO();
+  let current = data.weeks.find(w => w.start <= today && today <= w.end);
+  const card = document.getElementBy
+  if (!current) {
+    // fall back to nearest upcoming
+    current = data.weeks.find(w => w.start >= today) || data.weeks[data.weeks.length-1];
+  }
+  const isLive = current.start <= today && today <= current.end;
+  const idx = data.people.indexOf(cu
+  const color = colorForIndex(idx);
+  card.innerHTML = `
+    <div class="now-flex">
+      <div class="now-badge"><span ce ? "On call this week" : "Next up"}</
+div>
+      <div class="now-name" style="cll || "—"}</div>
+      <div class="now-range">${fmtRange(current.start, current.end)}</div>
+    </div>
+    ${current.comment ? `<div class="now-comment">${escapeHTML(current.comment)}</div>` : ""}
+  `;
+}
+
+function buildChips(){
+  const data = SCHEDULE[activeSheet]
+  const chips = document.getElementById("chips");
+  chips.innerHTML = "";
+  data.people.forEach((name, i) => {
+    const chip = document.createElem
+    chip.className = "chip" + (activeFilter === name ? " active" : "");
+    const total = data.totals[name] ame] : "";
+    chip.innerHTML = `<span class="swatch" style="background:${colorForIndex(i)}"></span>${name} <span
+class="count">${total}</span>`;
+    chip.onclick = () => { activeFilter = (activeFilter === name) ? null : name; render(); };
+    chips.appendChild(chip);
+  });
+}
+
+function buildList(){
+  const data = SCHEDULE[activeSheet];
+  const list = document.getElementBy
+  list.innerHTML = "";
+  const today = todayISO();
+  const changedSet = changedWeeksBySheet[activeSheet] || new Set();
+  const filtered = activeFilter ? da === activeFilter) : data.weeks;
+
+  if (filtered.length === 0) {
+    list.innerHTML = `<div class="empty-msg">No weeks match this filter.</div>`;
+    return;
+  }
+
+  let lastMonth = null;
+  filtered.forEach(w => {
+    const mk = monthYearKey(w.start);
+    if (mk !== lastMonth) {
+      const h = document.createElement("div");
+      h.className = "month-heading";
+      h.textContent = mk;
+      list.appendChild(h);
+      lastMonth = mk;
+    }
+    const idx = data.people.indexOf(w.onCall);
+    const color = colorForIndex(idx)
+    const isToday = w.start <= today && today <= w.end;
+    const isPast = w.end < today;
+    const backupUsed = w.onCall && w.values[w.onCall] === 2;
+    const isChanged = changedSet.has
+
+    const row = document.createEleme
+    row.className = "week-row" + (isToday ? " is-today" : "") + (isPast ? " is-past" : "") + (isChanged
+ ? " is-changed" : "");
+    const s = new Date(w.start + "T00:00:00");
+    const e = new Date(w.end + "T00:
+    row.innerHTML = `
+      <div class="week-dates">${s.toth:"short",day:"numeric"})}–${e.toLoca
+leDateString("en-US",{day:"numeric"})}<div class="yr">${s.getFullYear()}</div></div>
+      <div class="week-mid">
+        <div class="week-name"><span class="week-swatch" style="background:${color}"></span>${w.onCall
+|| "Unassigned"}</div>
+        ${w.comment ? `<div class="week-comment">${escapeHTML(w.comment)}</div>` : ""}
+      </div>
+      <div class="week-badges">
+        ${backupUsed ? `<span class=>` : ""}
+        ${isChanged ? `<span class="badge-changed">Updated</span>` : ""}
+      </div>
+    `;
+    list.appendChild(row);
+  });
+}
+
+function buildTotalsFoot(){
+  const data = SCHEDULE[activeSheet];
+  const foot = document.getElementBy
+  foot.innerHTML = data.people.map(p => `<span>${p} <b>${data.totals[p] ?? 0}</b> wk${(data.totals[p]??
+0)===1?"":"s"}</span>`).join("");
+}
+
+function escapeHTML(str){
+  const d = document.createElement("
+  d.textContent = str;
+  return d.innerHTML;
+}
+
+function render(){
+  buildTabs();
+  buildNowCard();
+  buildChips();
+  buildList();
+  buildTotalsFoot();
+  const d = new Date();
+  document.getElementById("updated-l" + d.toLocaleDateString("en-US",{mont
+h:"short",day:"numeric",year:"numeric"});
+}
+
+// ---- Gate logic ----
+function tryUnlock(){
+  const input = document.getElementB
+  const err = document.getElementById("gate-error");
+  if (input === PASSWORD) {
+    try {
+      localStorage.setItem("sleep-on
+    } catch(e) {}
+    document.getElementById("gate").
+    document.getElementById("app").style.display = "block";
+    primeChangedWeeks();
+    render();
+  } else {
+    err.textContent = "That password isn't right — check with whoever sent you the link.";
+  }
+}
+document.getElementById("unlock-btn"ryUnlock);
+document.getElementById("password").addEventListener("keydown", e => { if (e.key === "Enter") tryUnlock
+(); });
+
+(function initialCheck(){
+  let already = false;
+  try { already = localStorage.getIt1"; } catch(e) {}
+  if (already) {
+    document.getElementById("gate").
+    document.getElementById("app").style.display = "block";
+    primeChangedWeeks();
+    render();
+  }
+})();
+</script>
+
+</body></html>
